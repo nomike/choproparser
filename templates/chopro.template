@@ -1,0 +1,24 @@
+<% import choproparser.parser %>
+% for section in song.sections:
+    % if section.name and len(section.name) > 0:
+{begin_of_${section.name}}
+    % endif
+    % for line in section.lines:
+        % if isinstance(line, choproparser.parser.HiddenComment):
+#${line.text}
+        % elif isinstance(line, choproparser.parser.ChordTextLine):
+            % for chord_text in line.chord_texts:
+                % if len(chord_text.chord) > 0:
+[${chord_text.chord}]\
+                % endif
+${chord_text.text}\
+            % endfor
+
+        % elif isinstance(line, choproparser.parser.MetadataLine):
+{${line.key}: ${line.value}}
+        % endif
+    % endfor
+    % if section.name and len(section.name) > 0:
+{end_of_${section.name}}
+    % endif
+% endfor

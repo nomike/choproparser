@@ -80,7 +80,7 @@ class ChordTextLine(ChoProLine):
             if len(chord_text.chord) > 0:
                 string = string + "[%s]" % (chord_text.chord)
             string = string + chord_text.text
-        return string
+        return string + '\n'
 
 class Section():
     def __init__(self, name=None, lines=None):
@@ -95,7 +95,7 @@ class Section():
         if self.name:
             string = string + '{start_of_%s}\n' % (self.name)
         for line in self.lines:
-            string = string + "%s\n" % (str(line))
+            string = string + "%s" % (str(line))
         if self.name:
             string = string + '{end_of_%s}\n' % (self.name)
         return string
@@ -117,7 +117,7 @@ class Song():
         # for key, value in self.metadata.items():
         #     string = string + "{%s:%s}\n" % (key, value)
         for section in self.sections:
-            string = string + "%s\n" % (str(section))
+            string = string + "%s" % (str(section))
         return string
             
 
@@ -146,7 +146,6 @@ _chopro_directives_formatting = ['comment',
                             ]
 
 def read_chopro(stream):
-    section_stack = []
     song = Song()
     section = Section(name='')
 
@@ -178,35 +177,34 @@ def read_chopro(stream):
             if tokens[0] in _chopro_directives_metadata:
                 logging.debug('Found a metadata directive. Key="%s" Value="%s"' % (tokens[0], tokens[1]))
                 song.metadata[tokens[0]] = tokens[1]
-                section.lines.append(MetadataLine(tokens[0], tokens[1]))
+                section.lines.append(MetadataLine(tokens[0], tokens[1][1:]))
             elif tokens[0] in _chopro_directives_formatting:
                 logging.debug("Found a formatting directive")
                 if tokens[0] in ['comment', 'c']:
                     logging.debug("Found a comment")
-                    section.lines.append(Comment(tokens[1]))
+                    section.lines.append(Comment(tokens[1][1:]))
                 elif tokens[1] in ['comment_italic', 'ci']:
                     logging.debug("Found an italic comment")
-                    section.lines.append(Comment(tokens[1], comment_type='italic'))
+                    section.lines.append(Comment(tokens[1][1:], comment_type='italic'))
                 elif tokens[1] in ['comment_box', 'cb']:
                     logging.debug("Found a box comment")
-                    section.lines.append(Comment(tokens[1], comment_type='box'))
+                    section.lines.append(Comment(tokens[1][1:], comment_type='box'))
                 elif tokens[1] == 'highlight':
                     logging.debug("Found a highlight comment")
-                    section.lines.append(Comment(tokens[1], comment_type='highlight'))
+                    section.lines.append(Comment(tokens[1][1:], comment_type='highlight'))
             elif tokens[0].startswith('start_of_'):
                 section_name = tokens[0][9:]
                 logging.debug('Found a new section start with name "%s"' % (section_name))
-                section_stack.append(section_name)
                 logging.debug("Append last section to song")
                 song.sections.append(section)
                 logging.debug("Create a new section object")
                 section = Section(name=section_name)
-                foo = Section(name=section_name)
             elif tokens[0].startswith('end_of_'):
                 section_name = tokens[0][7:]
                 logging.debug('Found a section end with name "%s"' % (section_name))
-                if not section_name == section_stack.pop():
+                if not section_name == section.name:
                     raise SyntaxError(raw_line, line_number, "Trying to end section which hasn't started")
+                song.sections.append(section)
                 section = Section()
             else:
                 logging.warning('Unhandled directive "%s"' % (tokens[0]))
