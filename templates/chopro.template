@@ -4,9 +4,7 @@
 {begin_of_${section.name}}
     % endif
     % for line in section.lines:
-        % if isinstance(line, choproparser.parser.HiddenComment):
-#${line.text}
-        % elif isinstance(line, choproparser.parser.ChordTextLine):
+        % if isinstance(line, choproparser.parser.ChordTextLine):
             % for chord_text in line.chord_texts:
                 % if len(chord_text.chord) > 0:
 [${chord_text.chord}]\
@@ -14,6 +12,16 @@
 ${chord_text.text}\
             % endfor
 
+        % elif isinstance(line, choproparser.parser.Comment):
+            % if line.comment_type == '':
+{comment: ${line.text}}
+            % elif line.comment_type == 'highlight':
+{highlight: ${line.text}}
+            % else:
+{comment_${line.comment_type}: ${line.text}}
+            % endif
+        % elif isinstance(line, choproparser.parser.HiddenComment):
+#${line.text}
         % elif isinstance(line, choproparser.parser.MetadataLine):
 {${line.key}: ${line.value}}
         % endif
