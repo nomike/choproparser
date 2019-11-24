@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# ChoProParser - A parser which reads ChordPro files and converts them
+# choproparser - A parser which reads ChordPro files and converts them
 # into different formats using templates.
 # Copyright (C) 2019  nomike <nomike@nomike.com>
 
