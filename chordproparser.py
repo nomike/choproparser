@@ -26,10 +26,10 @@ def main():
     logging.basicConfig(level=logging.INFO)
     with open('example.cho') as file:
         song = parser.read_chopro(file)
-    template = Template(filename='templates/chopro.template')
+    template = Template(filename='templates/__str__.template')
     text = template.render(song=song)
-#    print(text)
-    print (song)
+    print(text)
+    #print(song)
 
 if __name__ == "__main__":
     main()
