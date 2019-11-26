@@ -1,0 +1,44 @@
+<% import choproparser.parser %>
+<html>
+    <head>
+        <title>${song.metadata['title']}</title>
+        <link rel="stylesheet" href="simple_html.css"/>
+    </head>
+    <body>
+        <h1>${song.metadata['title']}</h1>
+% for section in song.sections:
+    % if section.name and len(section.name) > 0:
+        <div class="section">
+            <div class="section_header">${section.name}</div>
+    % endif
+    % for line in section.lines:
+        % if isinstance(line, choproparser.parser.ChordTextLine):
+            <div class="chord_text_line">
+            % for chord_text in line.chord_texts:
+                % if len(chord_text.chord) > 0:
+<span class="chord">${chord_text.chord}</span>\
+                % endif
+${chord_text.text}\
+            % endfor
+            </div>
+        % elif isinstance(line, choproparser.parser.Comment):
+            % if line.comment_type == '':
+            <div class="comment">${line.text}</div>
+            % elif line.comment_type == 'highlight':
+            <div class="hightlight">${line.text}</div>
+            % else:
+            <div class="comment_${line.comment_type}">${line.text}</div>
+            % endif
+        % elif isinstance(line, choproparser.parser.HiddenComment):
+            <!-- ${line.text} -->
+        % elif isinstance(line, choproparser.parser.MetadataLine):
+            <div class="metadata"><span class="key">${line.key}:</span> <span class="value">${line.value}</span> </div>
+        % endif
+    % endfor
+    % if section.name and len(section.name) > 0:
+            </div>
+    % endif
+% endfor
+        </div>
+    </body>
+</html>
