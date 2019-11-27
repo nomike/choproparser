@@ -1,5 +1,5 @@
 <% import choproparser.parser %>
-% for section in song.sections:
+% for section in songbook.songs[0].sections:
     % if section.name and len(section.name) > 0:
 {begin_of_${section.name}}
     % endif

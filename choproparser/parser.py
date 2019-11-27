@@ -52,6 +52,13 @@ class HiddenComment(ChoProLine):
     def __str__(self):
         return '#%s\n' % (self.text)
 
+class NewSongLine(ChoProLine):
+    def __init__(self):
+        super().__init__('new_song')
+
+    def __str__(self):
+        return '{new_song}'
+
 class Comment(ChoProLine):
     def __init__(self, text, comment_type=''):
         super().__init__("comment")
@@ -114,12 +121,22 @@ class Song():
     
     def __str__(self):
         string = ''
-        # for key, value in self.metadata.items():
-        #     string = string + "{%s:%s}\n" % (key, value)
         for section in self.sections:
             string = string + "%s" % (str(section))
         return string
             
+class Songbook():
+    def __init__(self, songs=None):
+        if songs:
+            self.songs = songs
+        else:
+            self.songs = []
+
+    def __str__(self):
+        string = ''
+        for song in self.songs:
+            string = string + str(song)
+        return string
 
 
 _chopro_directives_preamble = ['new_song', 'ns']
@@ -146,6 +163,7 @@ _chopro_directives_formatting = ['comment',
                             ]
 
 def read_chopro(stream):
+    songbook = Songbook()
     song = Song()
     section = Section(name='')
 
@@ -192,6 +210,11 @@ def read_chopro(stream):
                 elif tokens[1] == 'highlight':
                     logging.debug("Found a highlight comment")
                     section.lines.append(Comment(tokens[1][1:], comment_type='highlight'))
+            elif tokens[0] in _chopro_directives_preamble:
+                logging.debug('Found a preamle directive: "' % (tokens[0]))
+                songbook.songs.append(song)
+                song = Song()
+                section.lines.append(NewSongLine())
             elif tokens[0].startswith('start_of_'):
                 section_name = tokens[0][9:]
                 logging.debug('Found a new section start with name "%s"' % (section_name))
@@ -239,4 +262,5 @@ def read_chopro(stream):
             section.lines.append(chord_text_line)
     logging.debug("Append last section to song")
     song.sections.append(section)
-    return song
+    songbook.songs.append(song)
+    return songbook

@@ -39,9 +39,9 @@ def main():
     template_file = arguments['--template'] if not arguments['--template'] == None else 'templates/__str__.template'
     logger.debug("Selected template: %s" % (template_file))
     with open(arguments['<chordprofile>']) as file:
-        song = parser.read_chopro(file)
+        songbook = parser.read_chopro(file)
     template = Template(filename=template_file)
-    text = template.render(song=song)
+    text = template.render(songbook=songbook)
     print(text)
     #print(song)
 
