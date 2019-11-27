@@ -22,6 +22,7 @@ This template formats the first song in the songbook using plain and simple HTML
 containing a link to a simple CSS file.
 </%doc>
 <% import choproparser.parser %>
+<!DOCTYPE html>
 <html>
     <head>
         <title>${songbook.songs[0].metadata['title']}</title>
