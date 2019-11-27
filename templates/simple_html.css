@@ -6,6 +6,10 @@ div.chord_text_line {
     font-family: 'Courier New', Courier, monospace;
 }
 
+div.song {
+    page-break-before: always;
+}
+
 div.metadata {
     margin-bottom: 1.5em;
 }
