@@ -143,6 +143,7 @@ _chopro_directives_preamble = ['new_song', 'ns']
 _chopro_directives_metadata = [ 'title',
                        't',
                        'subtitle',
+                       'st',
                        'artist',
                        'composer',
                        'lyricist',
