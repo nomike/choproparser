@@ -119,6 +119,16 @@ class Song():
         else:
             self.metadata = {}
     
+    def get_chords(self):
+        chords = []
+        for section in self.sections:
+            for line in section.lines:
+                if isinstance(line, ChordTextLine):
+                    for chord_text in line.chord_texts:
+                        if len(chord_text.chord) > 0 and chord_text.chord not in chords:
+                            chords.append(chord_text.chord) 
+        return chords
+
     def __str__(self):
         string = ''
         for section in self.sections:
