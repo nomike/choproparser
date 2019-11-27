@@ -1,0 +1,87 @@
+<%doc>
+---BEGIN COPYRIGHT---
+choproparser - A parser which reads ChordPro files and converts them
+into different formats using templates.
+Copyright (C) 2019  nomike <nomike@nomike.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---END COPYRIGHT---
+
+This template formats the songbook in LATEX.
+</%doc>
+<% import choproparser.parser %>
+\documentclass{report}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\graphicspath{ {./chords/112x150/} }
+\newcommand\chord[2][l]{%
+  \makebox[0pt][#1]{\begin{tabular}[b]{@{}l@{}}#2\\\mbox{}\end{tabular}}}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Large}
+
+\begin{document}
+\title{nomike's ukulele songbook}
+\author{nomike}
+\date{2019}
+\maketitle
+\tableofcontents
+\newpage
+% for song in songbook.songs:
+\chapter{${song.metadata['title']}\
+    % if 'subtitle' in song.metadata:
+ - ${song.metadata['subtitle']}\
+    % endif
+}
+    % for chord in song.get_chords():
+        % if '/' not in chord:
+{\catcode`\#=12 \includegraphics{${chord}}}
+        % endif
+    % endfor
+    % for section in song.sections:
+        % if section.name and len(section.name) > 0:
+begin_of_${section.name}
+        % endif
+        % for line in section.lines:
+            % if isinstance(line, choproparser.parser.ChordTextLine):
+                % for chord_text in line.chord_texts:
+                    % if len(chord_text.chord) > 0:
+\chord{${chord_text.chord.replace('#', '\#')}}\
+                    % endif
+${chord_text.text}\
+                % endfor
+                % if len(line.chord_texts) == 0:
+\leavevmode${"\\\\"}
+                % else:
+${"\\\\"}
+                % endif
+            % elif isinstance(line, choproparser.parser.Comment):
+                % if line.comment_type == '':
+comment: ${line.text}
+                % elif line.comment_type == 'highlight':
+highlight: ${line.text}
+                % else:
+comment_${line.comment_type}: ${line.text}
+                % endif
+            % elif isinstance(line, choproparser.parser.HiddenComment):
+            % elif isinstance(line, choproparser.parser.MetadataLine) and line.key not in ['title', 't', 'subtitle', 'st']:
+${line.key}: ${line.value}
+            % endif
+        % endfor
+        % if section.name and len(section.name) > 0:
+end_of_${section.name}
+        % endif
+    % endfor
+\newpage
+% endfor
+\end{document}
