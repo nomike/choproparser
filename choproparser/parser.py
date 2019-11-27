@@ -171,7 +171,21 @@ _chopro_directives_formatting = ['comment',
                             'comment_italic',
                             'comment_box',
                             'image',
-                            ]
+                        ]
+_chopro_directives_environment = ['start_of_chorus',
+                            'soc',
+                            'end_of_chorus',
+                            'eoc',
+                            'chorus',
+                            'start_of_verse',
+                            'end_of_verse',
+                            'start_of_tab',
+                            'sot',
+                            'end_of_tab',
+                            'eot',
+                            'start_of_grid',
+                            'end_of_grid',
+                        ]
 
 def read_chopro(stream):
     songbook = Songbook()
@@ -232,20 +246,30 @@ def read_chopro(stream):
                 songbook.songs.append(song)
                 song = Song()
                 section.lines.append(NewSongLine())
-            elif tokens[0].startswith('start_of_'):
-                section_name = tokens[0][9:]
-                logging.debug('Found a new section start with name "%s"' % (section_name))
-                logging.debug("Append last section to song")
-                song.sections.append(section)
-                logging.debug("Create a new section object")
-                section = Section(name=section_name)
-            elif tokens[0].startswith('end_of_'):
-                section_name = tokens[0][7:]
-                logging.debug('Found a section end with name "%s"' % (section_name))
-                if not section_name == section.name:
-                    raise SyntaxError(raw_line, line_number, "Trying to end section which hasn't started")
-                song.sections.append(section)
-                section = Section()
+            elif tokens[0] in _chopro_directives_environment:
+                logging.debug('Found an environment directive: "%s"' % (tokens[0]))
+                if tokens[0] == 'soc':
+                    tokens[0] == 'start_of_chorus'
+                if tokens[0] == 'eoc':
+                    tokens[0] == 'end_of_chorus'
+                if tokens[0] == 'sot':
+                    tokens[0] == 'start_of_tab'
+                if tokens[0] == 'eot':
+                    tokens[0] == 'end_of_chorus'
+                if tokens[0].startswith('start_of_'):
+                    section_name = tokens[0][9:]
+                    logging.debug('Found a new section start with name "%s"' % (section_name))
+                    logging.debug("Append last section to song")
+                    song.sections.append(section)
+                    logging.debug("Create a new section object")
+                    section = Section(name=section_name)
+                elif tokens[0].startswith('end_of_'):
+                    section_name = tokens[0][7:]
+                    logging.debug('Found a section end with name "%s"' % (section_name))
+                    if not section_name == section.name:
+                        raise SyntaxError(raw_line, line_number, "Trying to end section which hasn't started")
+                    song.sections.append(section)
+                    section = Section()
             else:
                 logging.warning('Unhandled directive "%s"' % (tokens[0]))
         else:               # line is not special, look for chords
