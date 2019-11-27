@@ -4,17 +4,17 @@
 # choproparser - A parser which reads ChordPro files and converts them
 # into different formats using templates.
 # Copyright (C) 2019  nomike <nomike@nomike.com>
-
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -211,7 +211,7 @@ def read_chopro(stream):
                     logging.debug("Found a highlight comment")
                     section.lines.append(Comment(tokens[1][1:], comment_type='highlight'))
             elif tokens[0] in _chopro_directives_preamble:
-                logging.debug('Found a preamle directive: "' % (tokens[0]))
+                logging.debug('Found a preamble directive: "' % (tokens[0]))
                 songbook.songs.append(song)
                 song = Song()
                 section.lines.append(NewSongLine())
