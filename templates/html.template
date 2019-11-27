@@ -21,44 +21,61 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 This template formats the first song in the songbook using plain and simple HTML
 containing a link to a simple CSS file.
 </%doc>
-<% import choproparser.parser %>
+<% import choproparser.parser, hashlib %>
+<!DOCTYPE html>
 <html>
     <head>
         <title>${songbook.songs[0].metadata['title']}</title>
-        <link rel="stylesheet" href="simple_html.css"/>
+        <link rel="stylesheet" href="../templates/simple_html.css"/>
     </head>
     <body>
-        <h1>${songbook.songs[0].metadata['title']}</h1>
-% for section in songbook.songs[0].sections:
-    % if section.name and len(section.name) > 0:
+    <div class="toc">
+% for song in songbook.songs:
+        <p><a href="#${hashlib.sha256(song.__str__().encode('utf-8')).hexdigest()}">${song.metadata['title']}</a>
+    </div>
+% endfor    
+% for song in songbook.songs:
+    <div class="song">
+        <a name="${hashlib.sha256(song.__str__().encode('utf-8')).hexdigest()}" />
+        <h1>${song.metadata['title']}</h1>
+    % if 'subtitle' in song.metadata:
+        <p>${song.metadata['subtitle']}</p>
+    % endif
+    % for chord in song.get_chords():
+<img src="chords/112x150/${chord}.png" alt="${chord}"</img>
+    % endfor
+    % for section in song.sections:
+        % if section.name and len(section.name) > 0:
         <div class="section">
             <div class="section_header">${section.name}</div>
-    % endif
-    % for line in section.lines:
-        % if isinstance(line, choproparser.parser.ChordTextLine):
+        % endif
+        % for line in section.lines:
+            % if isinstance(line, choproparser.parser.ChordTextLine):
             <div class="chord_text_line"><p>\
-            % for chord_text in line.chord_texts:
-<span data-chord="${chord_text.chord}">${"&nbsp;" if chord_text.text is "" else chord_text.text}</span>\
-            % endfor
+                % for chord_text in line.chord_texts:
+<span data-chord="${chord_text.chord}">${"&nbsp;" if chord_text.text is "" else chord_text.text.replace(' ', '&nbsp;')}</span>\
+                % endfor
 </p></div>
-        % elif isinstance(line, choproparser.parser.Comment):
-            % if line.comment_type == '':
+            % elif isinstance(line, choproparser.parser.Comment):
+                % if line.comment_type == '':
             <span class="comment">${line.text}</span>
-            % elif line.comment_type == 'highlight':
+                % elif line.comment_type == 'highlight':
             <div class="hightlight">${line.text}</div>
-            % else:
+                % else:
             <div class="comment_${line.comment_type}">${line.text}</div>
-            % endif
-        % elif isinstance(line, choproparser.parser.HiddenComment):
+                % endif
+            % elif isinstance(line, choproparser.parser.HiddenComment):
             <!-- ${line.text} -->
-        % elif isinstance(line, choproparser.parser.MetadataLine) and line.key not in ['title', 't']:
+            % elif isinstance(line, choproparser.parser.MetadataLine) and line.key not in ['title', 't']:
             <div class="metadata"><span class="key">${line.key}:</span> <span class="value">${line.value}</span> </div>
+            % endif
+        % endfor
+        % if section.name and len(section.name) > 0:
+            </div>
         % endif
     % endfor
-    % if section.name and len(section.name) > 0:
-            </div>
-    % endif
-% endfor
         </div>
+        </div>
+% endfor
     </body>
 </html>
