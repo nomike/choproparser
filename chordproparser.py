@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Usage:
-chordproparser.py [-v|--verbose] [--template=<template>] <chordprofile>
+chordproparser.py [-v|--verbose] [--template=<template>] <chordprofile>...
 chordproparser.py -h | --help | --version
 """
 
@@ -38,8 +38,10 @@ def main():
     logger = logging.getLogger("main")
     template_file = arguments['--template'] if not arguments['--template'] == None else 'templates/__str__.template'
     logger.debug("Selected template: %s" % (template_file))
-    with open(arguments['<chordprofile>']) as file:
-        songbook = parser.read_chopro(file)
+    songbook = parser.Songbook()
+    for chordprofile in arguments['<chordprofile>']:
+        with open(chordprofile) as file:
+            songbook.songs.extend(parser.read_chopro(file).songs)
     template = Template(filename=template_file)
     text = template.render(songbook=songbook)
     print(text)
