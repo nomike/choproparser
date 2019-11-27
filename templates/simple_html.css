@@ -1,16 +1,28 @@
+body {
+    font-family: sans-serif;
+}
+
+div.chord_text_line {
+    font-family: 'Courier New', Courier, monospace;
+}
+
 div.metadata {
     margin-bottom: 1.5em;
 }
 
 div.section {
-    margin-bottom: 1em;
+    margin-bottom: 2em;
+    border-left: 2px solid black;
+    padding-left: 10px;
 }
 
 div.section_header {
+    text-transform: capitalize;
     font-weight: bold;
 }
 
 div.metadata > span.key {
+    text-transform: capitalize;
     font-weight: bold;
 }
 
@@ -27,9 +39,20 @@ span.chord::after {
     content: "]";
 }
 
-div.comment {
+span.comment {
     margin-top: 1em;
     margin-bottom: 1em;
-    border: 1px solid gray;
-    background-color: lightgray;
+    padding-left: 3em;
+    font-style: italic;
+}
+
+span[data-chord] {
+    position: relative;
+}
+  
+span[data-chord]::before {
+    color: red;
+    content: attr(data-chord);
+    position: absolute;
+    top: -1em;
 }

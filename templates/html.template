@@ -36,25 +36,22 @@ containing a link to a simple CSS file.
     % endif
     % for line in section.lines:
         % if isinstance(line, choproparser.parser.ChordTextLine):
-            <div class="chord_text_line">
+            <div class="chord_text_line"><p>\
             % for chord_text in line.chord_texts:
-                % if len(chord_text.chord) > 0:
-<span class="chord">${chord_text.chord}</span>\
-                % endif
-${chord_text.text}\
+<span data-chord="${chord_text.chord}">${"&nbsp;" if chord_text.text is "" else chord_text.text}</span>\
             % endfor
-            </div>
+</p></div>
         % elif isinstance(line, choproparser.parser.Comment):
             % if line.comment_type == '':
             <span class="comment">${line.text}</span>
             % elif line.comment_type == 'highlight':
-            <span class="hightlight">${line.text}</span>
+            <div class="hightlight">${line.text}</div>
             % else:
-            <span class="comment_${line.comment_type}">${line.text}</span>
+            <div class="comment_${line.comment_type}">${line.text}</div>
             % endif
         % elif isinstance(line, choproparser.parser.HiddenComment):
             <!-- ${line.text} -->
-        % elif isinstance(line, choproparser.parser.MetadataLine):
+        % elif isinstance(line, choproparser.parser.MetadataLine) and line.key not in ['title', 't']:
             <div class="metadata"><span class="key">${line.key}:</span> <span class="value">${line.value}</span> </div>
         % endif
     % endfor
