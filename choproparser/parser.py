@@ -194,9 +194,15 @@ def read_chopro(stream):
             if len(tokens) == 1:
                 tokens.append(None)
             if tokens[0] in _chopro_directives_metadata:
-                logging.debug('Found a metadata directive. Key="%s" Value="%s"' % (tokens[0], tokens[1]))
-                song.metadata[tokens[0]] = tokens[1]
-                section.lines.append(MetadataLine(tokens[0], tokens[1][1:]))
+                key = tokens[0]
+                value = tokens[1]
+                if key == 't':
+                    key = 'title'
+                elif key == 'st':
+                    key = 'subtitle'
+                logging.debug('Found a metadata directive. Key="%s" Value="%s"' % (key, value))
+                song.metadata[key] = value
+                section.lines.append(MetadataLine(key, value))
             elif tokens[0] in _chopro_directives_formatting:
                 logging.debug("Found a formatting directive")
                 if tokens[0] in ['comment', 'c']:
