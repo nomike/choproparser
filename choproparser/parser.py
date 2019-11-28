@@ -168,8 +168,11 @@ _chopro_directives_metadata = [ 'title',
                        'meta',
                      ]
 _chopro_directives_formatting = ['comment',
+                            'c',
                             'comment_italic',
+                            'ci',
                             'comment_box',
+                            'cb'
                             'image',
                         ]
 _chopro_directives_environment = ['start_of_chorus',
