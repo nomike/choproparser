@@ -234,16 +234,16 @@ def read_chopro(stream):
                 logging.debug("Found a formatting directive")
                 if tokens[0] in ['comment', 'c']:
                     logging.debug("Found a comment")
-                    section.lines.append(Comment(tokens[1][1:]))
+                    section.lines.append(Comment(tokens[1]))
                 elif tokens[1] in ['comment_italic', 'ci']:
                     logging.debug("Found an italic comment")
-                    section.lines.append(Comment(tokens[1][1:], comment_type='italic'))
+                    section.lines.append(Comment(tokens[1], comment_type='italic'))
                 elif tokens[1] in ['comment_box', 'cb']:
                     logging.debug("Found a box comment")
-                    section.lines.append(Comment(tokens[1][1:], comment_type='box'))
+                    section.lines.append(Comment(tokens[1], comment_type='box'))
                 elif tokens[1] == 'highlight':
                     logging.debug("Found a highlight comment")
-                    section.lines.append(Comment(tokens[1][1:], comment_type='highlight'))
+                    section.lines.append(Comment(tokens[1], comment_type='highlight'))
             elif tokens[0] in _chopro_directives_preamble:
                 logging.debug('Found a preamble directive: "' % (tokens[0]))
                 songbook.songs.append(song)
