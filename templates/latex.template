@@ -36,29 +36,38 @@ def escapechord(chord):
     return "".join([numbersdict[i] if i in numbersdict else i for i in chord]).lower().replace('#', 'sharp').replace('/', 'slash').replace('-', 'dash')
 %>
 \documentclass{report}
-\usepackage[full]{leadsheets}
+\usepackage{ifpdf}
+\usepackage[chorded]{songs}
 \usepackage{ukulelechords}
 
+\newindex{mainindex}{idxfile}
 
 \begin{document}
+\songcolumns{1}
+
 \title{nomike's ukulele songbook}
 \author{nomike}
 \date{2019}
 \maketitle
-\tableofcontents
+\showindex[2]{Index of Song Titles}{mainindex}
 \newpage
-\chordcmaj \chordcmajseven \chordfmaj
-\begin{song}{title={Imagine}, music={John Lennon}, short-title={Imagine - John Lennon}}
-\begin{verse}
-Intro,  $\times$ 2${"\\\\"}
 
-\chord{C} \chord{Cmaj7} \chord{F}
-\chord{C}Imagine there's ^{Cmaj7}no ^{F}heaven ${"\\\\"}
-^{C}It's easy if ^{Cmaj7}you ^{F}try ${"\\\\"}
-^{C}No hell ^{Cmaj7}below ^{F}us ${"\\\\"}
-^{C}Above us ^{Cmaj7}only ^{F}sky ${"\\\\"}
-\end{verse}
-\end{song}
+\songsection{Songs}
+
+\begin{songs}{}
+\beginsong{Imagine}[by={John Lennon}]
+\chordcmaj \chordcmajseven \chordfmaj
+
+\beginverse
+Intro,  $\times$ 2
+
+\[C] \[Cmaj7] \[F]
+\[C]Imagine there's \[Cmaj7]no \[F]heaven
+\[C]It's easy if \[Cmaj7]you \[F]try
+\[C]No hell \[Cmaj7]below \[F]us
+\[C]Above us \[Cmaj7]only \[F]sky
+\endverse
+\endsong
 \newpage
 % for song in songbook.songs:
 <%doc>\chapter{${song.metadata['title']}\
@@ -66,18 +75,25 @@ Intro,  $\times$ 2${"\\\\"}
  - ${song.metadata['subtitle']}\
     % endif
 }</%doc>
+\beginsong{${song.metadata['title']}}[\
+% if 'subtitle' in song.metadata:
+    by={${song.metadata['subtitle']}}\
+% endif
+]
     % for chord in song.get_chords():
 \ifdefined\chord${escapechord(chord)}
 \chord${escapechord(chord)}
+\else
+${chord.replace('#','\#')}
 \fi
     % endfor
-\begin{song}{title={${song.metadata['title']}}, music={\
-% if 'subtitle' in song.metadata:
-${song.metadata['subtitle']}\
-% endif
-}}
-<%doc>
+
     % for section in song.sections:
+        % if section.name.lower() == "chorus":
+\beginchorus
+        % else:
+\beginverse
+        % endif
         % if section.name and len(section.name) > 0:
 begin_of_${section.name}
         % endif
@@ -85,11 +101,11 @@ begin_of_${section.name}
             % if isinstance(line, choproparser.parser.ChordTextLine):
                 % for chord_text in line.chord_texts:
                     % if len(chord_text.chord) > 0:
-^{C}\
+\[${chord_text.chord}]\
                     % endif
 ${chord_text.text}\
                 % endfor
-${"\\\\"}
+${" "}
             % elif isinstance(line, choproparser.parser.Comment):
                 % if line.comment_type == '':
 comment: ${line.text}
@@ -106,9 +122,14 @@ ${line.key}: ${line.value}
         % if section.name and len(section.name) > 0:
 end_of_${section.name}
         % endif
+        % if section.name.lower() == "chorus":
+\endchorus
+        % else:
+\endverse
+        % endif
     % endfor
-</%doc>
-\end{song}
+\endsong
 \newpage
 % endfor
+\end{songs}
 \end{document}
