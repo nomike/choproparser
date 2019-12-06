@@ -40,6 +40,7 @@ def main():
     logger.debug("Selected template: %s" % (template_file))
     songbook = parser.Songbook()
     for chordprofile in arguments['<chordprofile>']:
+        logger.info("Parsing file %s" % (chordprofile))
         with open(chordprofile) as file:
             songbook.songs.extend(parser.read_chopro(file).songs)
     template = Template(filename=template_file)
