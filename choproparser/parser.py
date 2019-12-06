@@ -252,13 +252,13 @@ def read_chopro(stream):
             elif tokens[0] in _chopro_directives_environment:
                 logging.debug('Found an environment directive: "%s"' % (tokens[0]))
                 if tokens[0] == 'soc':
-                    tokens[0] == 'start_of_chorus'
+                    tokens[0] = 'start_of_chorus'
                 if tokens[0] == 'eoc':
-                    tokens[0] == 'end_of_chorus'
+                    tokens[0] = 'end_of_chorus'
                 if tokens[0] == 'sot':
-                    tokens[0] == 'start_of_tab'
+                    tokens[0] = 'start_of_tab'
                 if tokens[0] == 'eot':
-                    tokens[0] == 'end_of_chorus'
+                    tokens[0] = 'end_of_tab'
                 if tokens[0].startswith('start_of_'):
                     section_name = tokens[0][9:]
                     logging.debug('Found a new section start with name "%s"' % (section_name))
