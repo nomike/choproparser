@@ -21,14 +21,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 This template formats the songbook in LATEX.
 </%doc>
 <% import choproparser.parser %>
+<%
+numbersdict = {'0': 'zero',
+                '1': 'one',
+                '2': 'two',
+                '3': 'three',
+                '4': 'four',
+                '5': 'five',
+                '6': 'six',
+                '7': 'seven',
+                '8': 'eight',
+                '9': 'nine',}
+def escapechord(chord):
+    return "".join([numbersdict[i] if i in numbersdict else i for i in chord]).lower().replace('#', 'sharp').replace('/', 'slash').replace('-', 'dash')
+%>
 \documentclass{report}
-\usepackage{graphicx}
-\usepackage{titlesec}
-\graphicspath{ {./chords/112x150/} }
-\newcommand\chord[2][l]{%
-  \makebox[0pt][#1]{\begin{tabular}[b]{@{}l@{}}#2\\\mbox{}\end{tabular}}}
-\titleformat{\chapter}[display]
-  {\normalfont\bfseries}{}{0pt}{\Large}
+\usepackage[full]{leadsheets}
+\usepackage{ukulelechords}
+
 
 \begin{document}
 \title{nomike's ukulele songbook}
@@ -37,17 +47,36 @@ This template formats the songbook in LATEX.
 \maketitle
 \tableofcontents
 \newpage
+\chordcmaj \chordcmajseven \chordfmaj
+\begin{song}{title={Imagine}, music={John Lennon}, short-title={Imagine - John Lennon}}
+\begin{verse}
+Intro,  $\times$ 2${"\\\\"}
+
+\chord{C} \chord{Cmaj7} \chord{F}
+\chord{C}Imagine there's ^{Cmaj7}no ^{F}heaven ${"\\\\"}
+^{C}It's easy if ^{Cmaj7}you ^{F}try ${"\\\\"}
+^{C}No hell ^{Cmaj7}below ^{F}us ${"\\\\"}
+^{C}Above us ^{Cmaj7}only ^{F}sky ${"\\\\"}
+\end{verse}
+\end{song}
+\newpage
 % for song in songbook.songs:
-\chapter{${song.metadata['title']}\
+<%doc>\chapter{${song.metadata['title']}\
     % if 'subtitle' in song.metadata:
  - ${song.metadata['subtitle']}\
     % endif
-}
+}</%doc>
     % for chord in song.get_chords():
-        % if '/' not in chord:
-{\catcode`\#=12 \includegraphics{${chord}}}
-        % endif
+\ifdefined\chord${escapechord(chord)}
+\chord${escapechord(chord)}
+\fi
     % endfor
+\begin{song}{title={${song.metadata['title']}}, music={\
+% if 'subtitle' in song.metadata:
+${song.metadata['subtitle']}\
+% endif
+}}
+<%doc>
     % for section in song.sections:
         % if section.name and len(section.name) > 0:
 begin_of_${section.name}
@@ -56,15 +85,11 @@ begin_of_${section.name}
             % if isinstance(line, choproparser.parser.ChordTextLine):
                 % for chord_text in line.chord_texts:
                     % if len(chord_text.chord) > 0:
-\chord{${chord_text.chord.replace('#', '\#')}}\
+^{C}\
                     % endif
 ${chord_text.text}\
                 % endfor
-                % if len(line.chord_texts) == 0:
-\leavevmode${"\\\\"}
-                % else:
 ${"\\\\"}
-                % endif
             % elif isinstance(line, choproparser.parser.Comment):
                 % if line.comment_type == '':
 comment: ${line.text}
@@ -82,6 +107,8 @@ ${line.key}: ${line.value}
 end_of_${section.name}
         % endif
     % endfor
+</%doc>
+\end{song}
 \newpage
 % endfor
 \end{document}
