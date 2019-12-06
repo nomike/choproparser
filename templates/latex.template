@@ -72,7 +72,7 @@ def escapechord(chord):
 ]
 \beginverse*
     % for chord in song.get_chords():
-\ifdefined\chord${escapechord(chord)} \chord${escapechord(chord)} \else ${chord.replace('#','\#')} \fi \
+\ifdefined\chord${escapechord(chord)} \chord${escapechord(chord)} \else ${chord.replace('#','\#')} \message{Chord "${chord.replace('#','\#')}" not defined.} \fi \
 % endfor
 \endverse
     % for section in song.sections:
