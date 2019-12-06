@@ -36,9 +36,13 @@ def escapechord(chord):
     return "".join([numbersdict[i] if i in numbersdict else i for i in chord]).lower().replace('#', 'sharp').replace('/', 'slash').replace('-', 'dash')
 %>
 \documentclass{report}
+\usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{ifpdf}
 \usepackage[chorded]{songs}
 \usepackage{ukulelechords}
+\usepackage{alltt}
+\usepackage{verbatim}
+\noversenumbers
 
 \newindex{mainindex}{idxfile}
 
@@ -55,20 +59,6 @@ def escapechord(chord):
 \songsection{Songs}
 
 \begin{songs}{}
-\beginsong{Imagine}[by={John Lennon}]
-\chordcmaj \chordcmajseven \chordfmaj
-
-\beginverse
-Intro,  $\times$ 2
-
-\[C] \[Cmaj7] \[F]
-\[C]Imagine there's \[Cmaj7]no \[F]heaven
-\[C]It's easy if \[Cmaj7]you \[F]try
-\[C]No hell \[Cmaj7]below \[F]us
-\[C]Above us \[Cmaj7]only \[F]sky
-\endverse
-\endsong
-\newpage
 % for song in songbook.songs:
 <%doc>\chapter{${song.metadata['title']}\
     % if 'subtitle' in song.metadata:
@@ -80,22 +70,18 @@ Intro,  $\times$ 2
     by={${song.metadata['subtitle']}}\
 % endif
 ]
+\beginverse*
     % for chord in song.get_chords():
-\ifdefined\chord${escapechord(chord)}
-\chord${escapechord(chord)}
-\else
-${chord.replace('#','\#')}
-\fi
-    % endfor
-
+\ifdefined\chord${escapechord(chord)} \chord${escapechord(chord)} \else ${chord.replace('#','\#')} \fi \
+% endfor
+\endverse
     % for section in song.sections:
-        % if section.name.lower() == "chorus":
+        % if section.name and section.name.lower() == "chorus":
 \beginchorus
+        % elif section.name and section.name.lower() == "tab":
+\begin{comment}
         % else:
 \beginverse
-        % endif
-        % if section.name and len(section.name) > 0:
-begin_of_${section.name}
         % endif
         % for line in section.lines:
             % if isinstance(line, choproparser.parser.ChordTextLine):
@@ -103,27 +89,26 @@ begin_of_${section.name}
                     % if len(chord_text.chord) > 0:
 \[${chord_text.chord}]\
                     % endif
-${chord_text.text}\
+${chord_text.text.replace('|', ' $\\vert$ ')}\
                 % endfor
 ${" "}
             % elif isinstance(line, choproparser.parser.Comment):
                 % if line.comment_type == '':
-comment: ${line.text}
+\textnote{${line.text}}
                 % elif line.comment_type == 'highlight':
-highlight: ${line.text}
+\textnote{${line.text}}
                 % else:
-comment_${line.comment_type}: ${line.text}
+\textnote{${line.text}}
                 % endif
             % elif isinstance(line, choproparser.parser.HiddenComment):
             % elif isinstance(line, choproparser.parser.MetadataLine) and line.key not in ['title', 't', 'subtitle', 'st']:
 ${line.key}: ${line.value}
             % endif
         % endfor
-        % if section.name and len(section.name) > 0:
-end_of_${section.name}
-        % endif
-        % if section.name.lower() == "chorus":
+        % if section.name and section.name.lower() == "chorus":
 \endchorus
+        % elif section.name and section.name.lower() == "tab":
+\end{comment}
         % else:
 \endverse
         % endif
